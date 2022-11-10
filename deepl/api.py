@@ -20,11 +20,7 @@ headers = {
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-site",
-    "user-agent": (
-        "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/83.0.4103.97 Mobile Safari/537.36"
-    ),
+    "user-agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.91 Mobile Safari/537.36",
 }
 
 
@@ -39,20 +35,23 @@ def split_into_sentences(text, **kwargs):
     return sentences
 
 
-def request_translation(source_language, target_language, text, **kwargs):
+def request_translation(source_language, target_language, text, proxies = False, **kwargs):
     sentences = split_into_sentences(text, **kwargs)
     data = generate_translation_request_data(
         source_language, target_language, sentences, **kwargs
     )
-    response = requests.post(API_URL, data=json.dumps(data), headers=headers)
+    if proxies:
+        response = requests.post(API_URL, data=json.dumps(data), headers=headers, proxies = proxies)
+    else:
+        response = requests.post(API_URL, data=json.dumps(data), headers=headers)
     return response
 
 
-def translate(source_language, target_language, text, **kwargs):
+def translate(source_language, target_language, text, proxies = False,  **kwargs):
     source_language = abbreviate_language(source_language)
     target_language = abbreviate_language(target_language)
 
-    response = request_translation(source_language, target_language, text, **kwargs)
+    response = request_translation(source_language, target_language, text, proxies, **kwargs)
     response.raise_for_status()
 
     json_response = response.json()
